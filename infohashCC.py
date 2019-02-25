@@ -3,6 +3,7 @@ import os.path
 from os import path
 import glob
 import bencoding, hashlib
+import io
 
 parser = argparse.ArgumentParser(description='Calculate and/or compare .torrent infohash values')
 parser.add_argument("-o",choices=['calculate', 'compare'], required=True, 
@@ -65,33 +66,31 @@ if args.o == 'calculate':
 	if len(caldict) > 0:
 		print('Calculated infohashes: ' + str(len(caldict)))
 		print('')
-		z=open('./calculated.txt', 'w+')
-		for key, value in caldict.items():
-			print(key+' => '+value)
-			name = os.path.basename(value)
-			z.write(key + '\t' + name + '\t' + value + '\n')
-			#print the array, mention the text file.
-		z.close()
-		print('')
-		print('See calculated.txt')
+		with io.open('./calculated.txt', 'w+', encoding='utf8') as z:
+			for key, value in caldict.items():
+				print(key+' => '+value)
+				name = os.path.basename(value)
+				z.write(key + '\t' + name + '\t' + value + '\n')
+				#print the array, mention the text file.
+			print('')
+			print('See calculated.txt')
 	else:
 		print('No torrents to process')
 else:
 	try:
-		with open(script_dir+ 'list.txt') as f:
+		with io.open(script_dir+ 'list.txt', encoding='utf8') as f:
 			lines = f.read().splitlines()#Insert txt values from list.txt in array. If zero values error. if values compare both arrays. Similar in a txt list.
 		if len(lines) > 0:
 			print('Infohashes to compare: '+ str(len(lines)))
 			print('')
-			w=open('./matches.txt', 'w+')
-			for x in range(len(lines)):
-				comparator = lines[x]
-				if comparator in caldict.keys():
-					print(comparator+' => '+caldict[comparator])
-					names = os.path.basename(caldict[comparator])
-					w.write(str(comparator) + '\t' + names + '\t' + str(caldict[comparator]) + '\n')
-					totals = totals+1
-			w.close()
+			with io.open('./matches.txt', 'w+', encoding='utf8') as w:
+				for x in range(len(lines)):
+					comparator = lines[x]
+					if comparator in caldict.keys():
+						print(comparator+' => '+caldict[comparator])
+						names = os.path.basename(caldict[comparator])
+						w.write(str(comparator) + '\t' + names + '\t' + str(caldict[comparator]) + '\n')
+						totals = totals+1
 			print('')
 			print('Matching infohases total: '+ str(totals))
 			if totals > 0:
@@ -99,4 +98,4 @@ else:
 		else:
 			print('No matching infohashes. Verify list.txt')
 	except:
-		print('')
+		print('Compare error.')
