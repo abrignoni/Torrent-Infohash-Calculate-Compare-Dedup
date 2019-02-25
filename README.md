@@ -2,6 +2,7 @@
 
 Python 3 script used to recursively calculate infohashes on files ending with the .torrent extension.  
 It can also take a list of known infohash values (list.txt) and find matching torrents recursively.  
+After calculation and/or comparison corresponding calculated.txt and matches.txt files are created in the same directory as the script.
 
 Script will create 
 
