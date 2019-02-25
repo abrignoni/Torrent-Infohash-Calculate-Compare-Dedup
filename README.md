@@ -14,7 +14,7 @@ Usage
 ![alt text](/images/Usage.PNG "Usage example")  
 
 Calculate infohash example:  
-![alt text](/images/Calculated_infohash.PNG "Usage example")
+![alt text](/images/Calculated_infohashes.PNG "Usage example")
 
 Compared infohash example:
 ![alt text](/images/Compared.PNG "Usage example")
