@@ -4,9 +4,11 @@ from os import path
 import glob
 import bencoding, hashlib
 import io
+import shutil
+import datetime
 
 parser = argparse.ArgumentParser(description='Calculate and/or compare .torrent infohash values')
-parser.add_argument("-o",choices=['calculate', 'compare'], required=True, 
+parser.add_argument("-o",choices=['calculate', 'compare', 'dedup'], required=True, 
                     help="Calculate or compare infohashes")
 parser.add_argument("-p", "--path", required=True, help="Path to .torrent files. For compare include list.txt in same directory as the script")
 
@@ -20,7 +22,9 @@ args = parser.parse_args()
 script_dir = os.path.dirname(__file__)
 caldict = dict()
 calfail = dict()
+caldedup = dict()
 totals = 0
+foldername = ("Dedup_Files_" + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
 print ('')
 print ('Infohash calculate & compare')
@@ -46,7 +50,7 @@ if args.path is not None:
 	if pathcheck:
 		#If there are .torrent files in it
 		#print('Path is real: ' +args.path)
-		for filename in glob.iglob(args.path+'\**', recursive=True):
+		for filename in glob.iglob(args.path+'/**', recursive=True):
 			if os.path.isfile(filename):
 				if filename.lower().endswith(('.torrent')):
 					try:
@@ -63,20 +67,21 @@ if args.path is not None:
 		parser.exit()	
 		
 if args.o == 'calculate':
-	if len(caldict) > 0:
-		print('Calculated infohashes: ' + str(len(caldict)))
-		print('')
-		with io.open('./calculated.txt', 'w+', encoding='utf8') as z:
-			for key, value in caldict.items():
-				print(key+' => '+value)
-				name = os.path.basename(value)
-				z.write(key + '\t' + name + '\t' + value + '\n')
-				#print the array, mention the text file.
-			print('')
-			print('See calculated.txt')
-	else:
-		print('No torrents to process')
-else:
+    if len(caldict) > 0:
+        print('Calculated infohashes: ' + str(len(caldict)))
+        print('')
+        with io.open('./calculated.txt', 'w+', encoding='utf8') as z:
+            for key, value in caldict.items():
+                print(key+' => '+value)
+                name = os.path.basename(value)
+                z.write(key + '\t' + name + '\t' + value + '\n')
+                #print the array, mention the text file.
+            print('')
+            print('See calculated.txt')
+    else:
+        print('No torrents to calculate')
+        
+elif args.o == 'compare':
 	try:
 		with io.open(script_dir+ 'list.txt', encoding='utf8') as f:
 			lines = f.read().splitlines()#Insert txt values from list.txt in array. If zero values error. if values compare both arrays. Similar in a txt list.
@@ -99,3 +104,18 @@ else:
 			print('No matching infohashes. Verify list.txt')
 	except:
 		print('Compare error.')
+        
+elif args.o == 'dedup':
+	if len(caldict) > 0:
+		print('Calculated infohashes: ' + str(len(caldict)))
+		print('')
+		os.mkdir(foldername)
+		with io.open('./'+foldername+'.txt','w+', encoding='utf8') as g:
+			for key, value in caldict.items():
+				print(key)
+				shutil.copy((value),('./'+foldername+'/'+key+'.torrent'))
+				g.write(key + '\n')
+			print('')
+			print('See dedup.txt')
+	else:
+		print('No torrents to dedup')  
