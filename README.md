@@ -9,6 +9,9 @@ Prerequisite:
 - If doing comparisons have a file named list.txt with one infohash per line in the same directory as the script.  
 - Enclose paths in quotations if any blank spaces in it. Ex: "C:\Program Files\"
 
+Update:  
+Deduplication option. Extracts unique infohash torrents from the source directory using the torrent infohash as the name of the file. The target directory is automaticaly created in the same folder as the script.
+
 Usage  
 ![alt text](/images/Usage.PNG "Usage example")  
 
